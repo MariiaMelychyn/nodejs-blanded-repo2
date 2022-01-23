@@ -25,9 +25,10 @@ connectDB();
 const books = require("./routes/booksRouts");
 const res = require("express/lib/response");
 const { required } = require("nodemon/lib/config");
+const { isRequired } = require("nodemon/lib/utils");
 
 app.use("/api/v1/books", books);// путь обработчик роутера
-app.post("/register", (req, res) => {
+app.post("/register", async (req, res) => {
 //1.получаємо дані від користувача(email, password, name)
 const { email, password } = req.body;
 
@@ -67,7 +68,7 @@ return res
 });
 
 
-app.post("/login", (req, res) => {
+app.post("/login", async (req, res) => {
 //1.получаємо дані від користувача(email, password, name)
 const { email, password } = req.body;
 //2.валідацію полів користувача
@@ -76,19 +77,53 @@ if (!password || !email){
   }
 //3.провіряємо чи користувач є у базі
 const user = await User.findOne({email});
-//4.якщо користувач є , то провіряємо логін його та пароль на валідність
+
+//4.якщо користувач є , то провіряємо логін його та пароль на валідність.
+//Якщо не валідний , то відповідаємо 400 статусом, невірний логін чи пароль
+if(!user){
+  return res.status(401)
+  .json({code: 401, message: 'no such user'})
+}
 // if (user){
 //   return res
 //   .status(409)
 //   .json({code: 409, message: 'user of ready'})
 // }
+const passwordFromDB = await bcryptjs.compare(password, user.password)
+// console.log(passwordFromDB);
+if(user.email !==  email || !passwordFromDB){
+  return res.status(401)
+  .json({code: 401, message: 'wrong login or password'})
+}
 
-//5. 
 
-//6. Провіряємо токін на валідність в базі даних, якщо валідний пропускаємо далі,якщо ні видаємо новий токен
+//5. Якщо логін і пароль валідний, провіряємо токін в базі даних.
+//Провіряємо токін на валідність в базі даних, якщо валідний пропускаємо далі,якщо ні видаємо новий токен
+// jwt.verify(user.token, process.env.JWT_SECRET_KEY, (err, decoded) => {
+//   console.log(decoded);
+//   console.log(err);
+// })
 
-
-})
+try{
+  const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+  if(decoded.user_id){
+    return res
+    .starus(200)
+    .json({code: 200, message: 'login success '})
+  };
+}catch(err){
+const token = await  jwt.sign({
+  user_id: user._id
+}, 
+process.env.JWT_SECRET_KEY,
+{expiresIn: '5h'}
+);
+user.token = token;
+await user.save()
+//7Пользуватель успішно зареєстрований
+return res.status(200).json({code: 200, message: 'Success'})
+}
+}),
 app.post("/logout", (req, res) => {
 
 })
