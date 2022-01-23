@@ -2,8 +2,8 @@ const { request } = require('express');
 const jwt = require('jsonwebtoken');
 
 const verifyToken = (req, res, next) => {
-const [Bearer, token]  = req.headers.authorization;
-console.log(token);
+const [Bearer, token]  = req.headers.authorization.split(' ');
+console.log(req.headers.authorization);
 if(!token){
     return res.status(403).json({code: 403, message: 'Tocen is required'})
 }

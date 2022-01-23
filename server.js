@@ -126,7 +126,7 @@ return res.status(200).json({code: 200, message: 'Success'})
 }),
 
 
-app.post("/logout", verifyToken(req, res) => {
+app.post("/logout", verifyToken, (req, res) => {
 //1.получаєм токен із заголовка
 console.log(req.user);
 //2.розшифрувати токен
