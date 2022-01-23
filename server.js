@@ -121,14 +121,20 @@ process.env.JWT_SECRET_KEY,
 user.token = token;
 await user.save()
 //7Пользуватель успішно зареєстрований
-return res.status(200).json({code: 200, message: 'Success'})
+return res.status(200).json({code: 200, message: 'login Success'})
 }
 }),
 
 
-app.post("/logout", verifyToken, (req, res) => {
+app.post("/logout", verifyToken, async(req, res) => {
 //1.получаєм токен із заголовка
-console.log(req.user);
+if(req.user_id){
+  const user = await User.findById({req.user.user_id})
+  user.token = null,
+  await user.save(),
+  return res.status(200).json({code: 200, message: 'logout Success'})
+}
+
 //2.розшифрувати токен
 //3.якщо в токені є payload_id то в базі ставимо token=null, 
 //4.якщо в токені не є pfyload_id то він розлогінувався
@@ -151,3 +157,6 @@ process.on("unhandledRejection", (error, _) => {
     server.close(() => process.exit(1)); //єтот код ошибки надо описать в readme.md
   }
 });
+
+//TODO
+//розібратись як робить метод FindById
