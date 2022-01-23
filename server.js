@@ -126,14 +126,16 @@ return res.status(200).json({code: 200, message: 'login Success'})
 }),
 
 
-app.post("/logout", verifyToken, async(req, res) => {
-//1.получаєм токен із заголовка
-if(req.user_id){
-  const user = await User.findById({req.user.user_id})
-  user.token = null,
-  await user.save(),
-  return res.status(200).json({code: 200, message: 'logout Success'})
-}
+app.post("/logout", verifyToken, async (req, res) => {
+  //1. Получаем токен из заголовков
+  console.log(req.user);
+  if (req.user.user_id) {
+    const user = await User.findById(req.user.user_id);
+    user.token = null;
+    await user.save();
+    return res.status(200).json({ code: 200, message: "Logout Succsess" });
+  }
+
 
 //2.розшифрувати токен
 //3.якщо в токені є payload_id то в базі ставимо token=null, 
