@@ -15,7 +15,7 @@ const User = require('./models/User');
 dotenv.config({ path: "./config/.env" });
 const bcryptjs = required('bcryptjs');
 const jwt = require('jsonwebtoken');
-
+const verifyToken = required('./middlewars/auth')
 app.use(cors());
 app.use(express.json());
 
@@ -124,8 +124,14 @@ await user.save()
 return res.status(200).json({code: 200, message: 'Success'})
 }
 }),
-app.post("/logout", (req, res) => {
 
+
+app.post("/logout", verifyToken(req, res) => {
+//1.получаєм токен із заголовка
+console.log(req.user);
+//2.розшифрувати токен
+//3.якщо в токені є payload_id то в базі ставимо token=null, 
+//4.якщо в токені не є pfyload_id то він розлогінувався
 })
 
 
