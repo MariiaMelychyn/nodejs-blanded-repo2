@@ -9,7 +9,7 @@
     "dev": "nodemon server.js"
   },
   "keywords": [],
-  "author": "Petro Davydov <petrodavydov@gmail.com>",
+  "author": "Mariia Melychyn <petrodavydov@gmail.com>",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
